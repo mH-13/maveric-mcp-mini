@@ -2,9 +2,7 @@ from src.common.db import ping, get_logs_collection
 from src.common.models import CellLog
 
 def main():
-    ok = ping()
-    print("Mongo ping:", "✅" if ok else "❌")
-
+    print("Mongo ping:", "✅" if ping() else "❌")
     coll = get_logs_collection()
     doc = CellLog(cell_id=1, status="ON", run_id=1).model_dump(mode="python")
     res = coll.insert_one(doc)

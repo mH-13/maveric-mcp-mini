@@ -3,57 +3,43 @@ import os
 from typing import Optional
 from pymongo import MongoClient, ASCENDING
 from pymongo.collection import Collection
-from datetime import timedelta
 
-def _get_client_uri() -> str:
+# Module-level singleton client for reuse
+_client: Optional[MongoClient] = None
+
+def _mongo_uri() -> str:
     return os.getenv("MONGO_URI", "mongodb://localhost:27017")
 
 def get_client() -> MongoClient:
-    """
-    Create a new MongoClient. In small scripts it's fine to create on demand.
-    In long-lived servers, keep one per process.
-    """
-    return MongoClient(_get_client_uri())
+    global _client
+    if _client is None:
+        _client = MongoClient(_mongo_uri())
+    return _client
 
-def get_logs_collection(client: Optional[MongoClient] = None) -> Collection:
-    """
-    Returns the cell_logs collection and ensures indexes exist.
-    """
-    close_client = False
-    if client is None:
-        client = get_client()
-        close_client = True
-
+def get_logs_collection() -> Collection:
+    client = get_client()
     dbname = os.getenv("MONGO_DB", "maveric")
     db = client[dbname]
     coll = db["cell_logs"]
 
-    # Indexes
+    # Index for time-based queries
     coll.create_index([("ts", ASCENDING)], background=True)
 
     # Optional TTL index if LOG_TTL_DAYS is set
-    ttl_days = os.getenv("LOG_TTL_DAYS")
+    ttl_days = (os.getenv("LOG_TTL_DAYS") or "").strip()
     if ttl_days:
         try:
             seconds = int(float(ttl_days) * 24 * 3600)
-            # Mongo requires an index on a single field with expireAfterSeconds
-            coll.create_index("ts", expireAfterSeconds=seconds, background=True, name="ts_ttl")
+            # Single-field TTL index required by Mongo
+            coll.create_index("ts", expireAfterSeconds=seconds, name="ts_ttl", background=True)
         except Exception:
-            # If parsing fails, just skip; user can fix later
-            pass
-
-    if close_client:
-        client.close()
+            pass  # ignore misconfig; you can fix the env later
 
     return coll
 
 def ping() -> bool:
-    """
-    Lightweight check the Mongo server is reachable.
-    """
-    client = get_client()
     try:
-        client.admin.command("ping")
+        get_client().admin.command("ping")
         return True
-    finally:
-        client.close()
+    except Exception:
+        return False
