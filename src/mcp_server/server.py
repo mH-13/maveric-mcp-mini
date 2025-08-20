@@ -10,7 +10,7 @@ load_dotenv()
 from mcp.server.fastmcp import FastMCP
 from src.common.db import get_logs_collection
 from src.common.models import CellLog
-from src.mcp_server.summarizers.groq_llm import summarize_with_groq
+from src.mcp_server.summarizers.groq_llm import summarize_logs_and_tower_info
 
 @dataclass
 class AppCtx:
@@ -53,9 +53,13 @@ def summarize_recent(minutes: int = 10) -> Dict[str, Any]:
     since = datetime.now(timezone.utc) - timedelta(minutes=minutes)
     cur = coll.find({"ts": {"$gte": since}})
 
+    logs = []
     total = on = off = 0
     per_cell: Dict[int, Dict[str, int]] = {}
+
+    # Collect logs and aggregate basic counts
     for d in cur:
+        logs.append(d)
         total += 1
         s = d["status"]
         on += (s == "ON")
@@ -64,12 +68,15 @@ def summarize_recent(minutes: int = 10) -> Dict[str, Any]:
         per_cell.setdefault(cid, {"ON": 0, "OFF": 0})
         per_cell[cid][s] += 1
 
+    # Basic statistics for the window
     lines = [f"Window: last {minutes} min", f"Total events: {total}", f"ON: {on}, OFF: {off}", "Per-cell:"]
     for cid in sorted(per_cell):
         lines.append(f"  cell {cid}: ON={per_cell[cid]['ON']} OFF={per_cell[cid]['OFF']}")
     stats_text = "\n".join(lines)
 
-    summary = summarize_with_groq(stats_text)
+    # Call Groq to generate natural language summary from stats
+    summary = summarize_logs_and_tower_info(logs)  # Clean, natural language summary
+
     return {"stats": stats_text, "summary": summary}
 
 if __name__ == "__main__":
