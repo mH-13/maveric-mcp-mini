@@ -1,0 +1,4 @@
+{
+    "stats": "Window: last 5 min\nTotal events: 160\nON: 99, OFF: 61\nPer-cell:\n  cell 1: ON=15 OFF=5\n  cell 2: ON=12 OFF=8\n  cell 3: ON=14 OFF=6\n  cell 4: ON=13 OFF=7\n  cell 5: ON=14 OFF=6\n  cell 6: ON=9 OFF=11\n  cell 7: ON=11 OFF=9\n  cell 8: ON=11 OFF=9",
+    "summary": "\ud83d\udfe2 NETWORK HEALTH: Warning\n\n\ud83d\udcca QUICK STATS:\n\u2022 62.5% of towers are online\n\u2022 Average uptime: 62.5%\n\u2022 3 towers are offline\n\n\ud83d\udea8 IMMEDIATE ACTIONS:\n\u2022 Investigate and repair Tower 2, Tower 4, and Tower 8 as they are offline\n\u2022 Monitor Tower 6 closely due to low uptime (45.0%)\n\n\u26a0\ufe0f MONITORING FOCUS:\n\u2022 Tower 6: Low uptime and potential for service disruption\n\u2022 Towers 2, 4, and 8: Offline and require immediate repair\n\nDATA:\n... (omitted for brevity)"
+}

@@ -2,6 +2,7 @@ import asyncio, os
 from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+import json 
 
 # Load environment variables
 load_dotenv()
@@ -43,13 +44,18 @@ async def main(minutes: int = 10):
             await session.initialize()
             res = await session.call_tool(name="summarize_recent", arguments={"minutes": minutes})
 
-            # Try common response shape
+            # Handle new MCP response structure
             try:
-                stats = res.result.get("stats")
-                summary = res.result.get("summary")
-            except Exception:
-                # Fallback for other shapes
-                stats = str(res)
+                if hasattr(res, 'structuredContent') and res.structuredContent:
+                    result = res.structuredContent.get('result', {})
+                    stats = result.get("stats", "No stats available")
+                    summary = result.get("summary", "No summary available")
+                else:
+                    # Fallback
+                    stats = str(res)
+                    summary = ""
+            except Exception as e:
+                stats = f"Error parsing response: {e}"
                 summary = ""
 
             print("\n=== STATS ===\n", stats)

@@ -49,8 +49,8 @@ maveric-mcp-mini/
 │   │   └── summarizers/     # AI summarization
 │   ├── generator/           # Log simulation
 │   └── clients/             # Client utilities
-├─ enhanced_analytics.ipynb  # Data visualization
-├─ simple_analytics.ipynb    # Enhanced analytics (no pandas)
+├─ enhanced_analytics.ipynb  # Advanced analytics dashboard
+├─ simple_analytics.ipynb    # Basic analytics (no pandas)
 ├─ docker-compose.yml        # MongoDB setup
 └─ requirements.txt          # Dependencies
 ```
@@ -80,14 +80,13 @@ class CellLog(BaseModel):
 ## Key Features
 
 - **Real-time Simulation**: Configurable cell tower behavior
-- **MCP Protocol**: Modern tool-calling interface
+- **MCP Protocol**: Modern tool-calling interface  
 - **AI Analysis**: Groq LLM for natural language summaries
-- **Visual Analytics**: Enhanced dashboards with SLA tracking
-- **Scalable Storage**: MongoDB with proper indexing
+- **Visual Analytics**: Jupyter dashboards with SLA tracking
+- **Scalable Storage**: MongoDB with automatic indexing
 
-## Quick Start
 
-See [DEV.md](DEV.md) for detailed setup and development instructions.
+See [DEV.md](DEV.md) for complete setup guide.
 
 ## License
 

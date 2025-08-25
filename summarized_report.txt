@@ -1,8 +1,35 @@
 Summary Report:
 ==================================================
 === STATS ===
-meta=None content=[TextContent(type='text', text='{\n  "stats": "Window: last 10 min\\nTotal events: 0\\nON: 0, OFF: 0\\nPer-cell:",\n  "summary": "Based on the log data, I\'ve summarized the tower status as follows:\\n\\n* Tower 1 (cell_id: 12345): \\n  - Last known status: ON\\n  - ON event: 08:00, 12:00\\n  - OFF event: None\\n  - No anomalies detected\\n\\n* Tower 2 (cell_id: 67890): \\n  - Last known status: OFF\\n  - ON event: 09:00, 14:00\\n  - OFF event: 10:00, 15:00, 16:00\\n  - Anomaly: Frequent flips (3 OFF events in a row)\\n\\n* Tower 3 (cell_id: 34567): \\n  - Last known status: ON\\n  - ON event: 07:00\\n  - OFF event: 18:00\\n  - Anomaly: Extended downtime (11 hours)\\n\\n* Tower 4 (cell_id: 90123): \\n  - Last known status: ON\\n  - ON event: 11:00\\n  - OFF event: 13:00\\n  - Anomaly: Frequent flips (2 OFF events in a row)\\n\\n* Tower 5 (cell_id: 45678): \\n  - Last known status: OFF\\n  - ON event: 17:00\\n  - OFF event: None\\n  - No anomalies detected\\n\\nNote: The log data does not provide a timestamp for the last known status, so it is assumed to be the last recorded status."\n}', annotations=None, meta=None)] structuredContent={'result': {'stats': 'Window: last 10 min\nTotal events: 0\nON: 0, OFF: 0\nPer-cell:', 'summary': "Based on the log data, I've summarized the tower status as follows:\n\n* Tower 1 (cell_id: 12345): \n  - Last known status: ON\n  - ON event: 08:00, 12:00\n  - OFF event: None\n  - No anomalies detected\n\n* Tower 2 (cell_id: 67890): \n  - Last known status: OFF\n  - ON event: 09:00, 14:00\n  - OFF event: 10:00, 15:00, 16:00\n  - Anomaly: Frequent flips (3 OFF events in a row)\n\n* Tower 3 (cell_id: 34567): \n  - Last known status: ON\n  - ON event: 07:00\n  - OFF event: 18:00\n  - Anomaly: Extended downtime (11 hours)\n\n* Tower 4 (cell_id: 90123): \n  - Last known status: ON\n  - ON event: 11:00\n  - OFF event: 13:00\n  - Anomaly: Frequent flips (2 OFF events in a row)\n\n* Tower 5 (cell_id: 45678): \n  - Last known status: OFF\n  - ON event: 17:00\n  - OFF event: None\n  - No anomalies detected\n\nNote: The log data does not provide a timestamp for the last known status, so it is assumed to be the last recorded status."}} isError=False
+Window: last 5 min
+Total events: 160
+ON: 99, OFF: 61
+Per-cell:
+  cell 1: ON=15 OFF=5
+  cell 2: ON=12 OFF=8
+  cell 3: ON=14 OFF=6
+  cell 4: ON=13 OFF=7
+  cell 5: ON=14 OFF=6
+  cell 6: ON=9 OFF=11
+  cell 7: ON=11 OFF=9
+  cell 8: ON=11 OFF=9
 ==================================================
 === SUMMARY ===
+🟢 NETWORK HEALTH: Warning
 
+📊 QUICK STATS:
+• 62.5% of towers are online
+• Average uptime: 62.5%
+• 3 towers are offline
+
+🚨 IMMEDIATE ACTIONS:
+• Investigate and repair Tower 2, Tower 4, and Tower 8 as they are offline
+• Monitor Tower 6 closely due to low uptime (45.0%)
+
+⚠️ MONITORING FOCUS:
+• Tower 6: Low uptime and potential for service disruption
+• Towers 2, 4, and 8: Offline and require immediate repair
+
+DATA:
+... (omitted for brevity)
 ==================================================

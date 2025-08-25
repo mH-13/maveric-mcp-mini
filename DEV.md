@@ -1,227 +1,118 @@
-# Development Guide
+# Maveric MCP Mini - Setup Guide
 
-Complete setup and development guide for the Maveric MCP Mini project.
+Real-time network tower monitoring with AI-powered analysis.
 
-## Prerequisites
+## Requirements
 
-- Python 3.9+
-- Docker & Docker Compose
-- Groq API key ([Get one here](https://console.groq.com/))
+- **Python 3.12.x
+- **Docker & Docker Compose**
+- **Groq API Key** → [Get free key](https://console.groq.com/)
 
-## Initial Setup
+## Quick Start
 
-### 1. Environment Setup
+### 1. Clone & Setup
 ```bash
 git clone <repo_url>
 cd maveric-mcp-mini
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configuration
+### 2. Configure API Key
 ```bash
 cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+echo "GROQ_API_KEY=your_key_here" >> .env
 ```
 
-### 3. Start Infrastructure
+### 3. Start Database
 ```bash
 docker compose up -d
 ```
 
-### 4. Verify Setup
+### 4. Test Connection
 ```bash
-# Test MongoDB connection
 python -m src.clients.db_ping
-
-# Should output: "MongoDB connection: OK"
+# Expected: "Mongo ping: ✅"
 ```
 
-## Running the System
+## Usage
 
-### Basic Workflow
+### 3-Terminal Workflow
 
-**Terminal 1: Start MCP Server**
+**Terminal 1: MCP Server**
 ```bash
 python -m src.mcp_server.server
+# Waits silently for connections (normal behavior)
 ```
 
 **Terminal 2: Generate Data**
 ```bash
-# Basic data generation (12 cells, 30 iterations)
-python -m src.generator.generate_logs --cells 12 --interval 2 --iterations 30
+# Quick test (2 minutes)
+python -m src.generator.generate_logs --cells 8 --interval 1 --iterations 30
 
-# Extended data generation (5 minutes of data)
+# Production demo (5 minutes)
 python -m src.generator.generate_logs --cells 12 --interval 2 --iterations 150
-
-# High-frequency data (1 second intervals)
-python -m src.generator.generate_logs --cells 20 --interval 1 --iterations 100
 ```
 
-**Terminal 3: Get AI Summary**
+**Terminal 3: Get AI Analysis**
 ```bash
 python -m src.clients.summarize_once
 ```
 
-### Generator Parameters
+#### *If you follow this far, the project should run and you shoud have a generated summary. Below is some detailed information for better understanding the commands and overall project*
 
-| Parameter | Description | Default | Example |
-|-----------|-------------|---------|---------|
-| `--cells` | Number of cell towers | 10 | `--cells 20` |
-| `--interval` | Seconds between updates | 3.0 | `--interval 1.5` |
-| `--iterations` | Number of update cycles | 10 | `--iterations 100` |
-| `--flip-prob` | Status change probability | 0.30 | `--flip-prob 0.25` |
+### Parameters
 
-### Environment Variables
+| Flag | Description | Default |
+|------|-------------|----------|
+| `--cells` | Tower count | 10 |
+| `--interval` | Seconds between updates | 3.0 |
+| `--iterations` | Update cycles | 10 |
+| `--flip-prob` | Status change rate | 0.30 |
+
+### Environment (.env)
 
 ```bash
-# MongoDB Configuration
+GROQ_API_KEY=your_key_here
 MONGO_URI=mongodb://localhost:27017
 MONGO_DB=maveric
-LOG_TTL_DAYS=30                    # Optional: Auto-delete old logs
-
-# Groq LLM Configuration  
-GROQ_API_KEY=your_key_here
-GROQ_MODEL=llama-3.1-8b-instant
-
-# MCP Server Configuration
-MCP_SERVER_NAME=MavericCellMCP
 ```
 
-## Data Analysis
+## Analytics
 
-### Jupyter Notebooks
-
-**Enhanced Analytics**
-- Original visualizations
-- Time series plots
-- Status heatmaps
-- Basic statistics
-- Color-coded visualizations
-- SLA compliance tracking
-- Anomaly detection
-- Performance insights
-
-### Running Analytics
 ```bash
-# Start Jupyter
 jupyter notebook
-
-# Or use Jupyter Lab
-jupyter lab
-
-# Open enhanced_analytics.ipynb or simple_analytics.ipynb
+# Open: enhanced_analytics.ipynb
 ```
 
-## Development Commands
+**Features**: Time series, heatmaps, SLA tracking, anomaly detection
 
-### Database Operations
-```bash
-# Check database status
-docker compose ps
+## Project Structure
 
-# View MongoDB logs
-docker compose logs mongo
-
-# Access MongoDB shell
-docker exec -it maveric-mcp-mini-mongo-1 mongosh maveric
-
-# Check collection stats
-db.cell_logs.stats()
-
-# Count recent logs
-db.cell_logs.count({ts: {$gte: new Date(Date.now() - 3600000)}})
+```
+src/
+├── common/          # Database & models
+├── mcp_server/      # FastMCP server + AI
+├── generator/       # Log simulation
+└── clients/         # Test utilities
 ```
 
-### MCP Server Testing
+## Testing & Debug
+
+### Verify System Components
 ```bash
-# Test MCP tools directly
+# Test MongoDB connection
+python -m src.clients.db_ping
+
+# Test MCP server tools
 python -m src.clients.mcp_fetch
 
-# Test with specific parameters
-python -c "
-import asyncio
-from src.clients.mcp_fetch import main
-asyncio.run(main(limit=50, minutes=30))
-"
-```
+# Check database status
+docker compose ps
+python -c "from src.common.db import get_logs_collection; print(f'Total logs: {get_logs_collection().count_documents({})}')"
 
-### Data Generation Scenarios
-
-**Testing Scenario**
-```bash
-# Quick test data (30 seconds)
-python -m src.generator.generate_logs --cells 8 --interval 1 --iterations 30
-```
-
-**Demo Scenario**
-```bash
-# 5 minutes of realistic data
-python -m src.generator.generate_logs --cells 12 --interval 2 --iterations 150 --flip-prob 0.3
-```
-
-**Stress Test Scenario**
-```bash
-# High-frequency data generation
-python -m src.generator.generate_logs --cells 50 --interval 0.5 --iterations 600 --flip-prob 0.2
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**"No data found in last X minutes"**
-```bash
-# Solution: Generate fresh data
-python -m src.generator.generate_logs --cells 12 --interval 1 --iterations 30
-```
-
-**MongoDB Connection Failed**
-```bash
-# Check if MongoDB is running
-docker compose ps mongo
-
-# Restart MongoDB
-docker compose restart mongo
-
-# Check logs
-docker compose logs mongo
-```
-
-**MCP Server Not Responding**
-```bash
-# Check if server is running in Terminal 1
-# Restart server if needed
-python -m src.mcp_server.server
-```
-
-**Groq API Errors**
-```bash
-# Verify API key is set
-echo $GROQ_API_KEY
-
-# Check .env file
-cat .env | grep GROQ_API_KEY
-```
-
-### Debug Commands
-
-**Check Data Availability**
-```bash
-# Quick data check
-python -c "
-from src.common.db import get_logs_collection
-from datetime import datetime, timedelta, timezone
-coll = get_logs_collection()
-since = datetime.now(timezone.utc) - timedelta(hours=1)
-count = coll.count_documents({'ts': {'$gte': since}})
-print(f'Logs in last hour: {count}')
-"
-```
-
-**Test MCP Connection**
-```bash
+# Test MCP connection
 python -c "
 import asyncio
 from mcp import ClientSession, StdioServerParameters
@@ -233,63 +124,77 @@ async def test():
         async with ClientSession(read, write) as session:
             await session.initialize()
             tools = await session.list_tools()
-            print(f'Available tools: {[t.name for t in tools.tools]}')
+            print(f'Available MCP tools: {[t.name for t in tools.tools]}')
 
 asyncio.run(test())
 "
+
+# Check recent data availability
+python -c "
+from src.common.db import get_logs_collection
+from datetime import datetime, timedelta, timezone
+coll = get_logs_collection()
+since = datetime.now(timezone.utc) - timedelta(minutes=30)
+count = coll.count_documents({'ts': {'\$gte': since}})
+print(f'Logs in last 30min: {count}')
+"
 ```
 
-## Development Workflow
-
-### 1. Start Development Environment
+### Data Generation Scenarios
 ```bash
-# Terminal 1: Infrastructure
-docker compose up -d
+# Quick test (30s)
+python -m src.generator.generate_logs --cells 8 --interval 1 --iterations 30
 
-# Terminal 2: MCP Server (keep running)
-python -m src.mcp_server.server
+# Demo (5min)
+python -m src.generator.generate_logs --cells 12 --interval 2 --iterations 150
 
-# Terminal 3: Development commands
+# Stress test
+python -m src.generator.generate_logs --cells 50 --interval 0.5 --iterations 600
+
+# Custom fetch test
+python -c "
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+async def fetch_custom(limit=10, minutes=30):
+    server = StdioServerParameters(command='python', args=['-m', 'src.mcp_server.server'])
+    async with stdio_client(server) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            res = await session.call_tool('fetch_logs', {'limit': limit, 'minutes': minutes})
+            if hasattr(res, 'structuredContent'):
+                result = res.structuredContent.get('result', [])
+                print(f'Found {len(result)} logs in last {minutes} minutes')
+                for log in result[:3]:
+                    print(f'  Cell {log[\"cell_id\"]}: {log[\"status\"]} at {log[\"ts\"]}') 
+            else:
+                print('No data found')
+
+asyncio.run(fetch_custom(10, 30))
+"
 ```
 
-### 2. Generate Test Data
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "No data found" | `python -m src.generator.generate_logs --cells 8 --interval 1 --iterations 20` |
+| MongoDB down | `docker compose restart mongo` |
+| MCP server hung | Restart Terminal 1: `python -m src.mcp_server.server` |
+| Groq API error | Check: `echo $GROQ_API_KEY` |
+| "Logs: 0" | Generate fresh data |
+
+### Database Operations
 ```bash
-# Generate sample data for testing
-python -m src.generator.generate_logs --cells 12 --interval 1 --iterations 60
+# MongoDB shell access
+docker exec -it maveric-mcp-mini-mongo-1 mongosh maveric
+
+# Inside MongoDB shell:
+db.cell_logs.stats()                                    # Collection stats
+db.cell_logs.count({ts: {$gte: new Date(Date.now() - 3600000)}})  # Recent logs
+db.cell_logs.getIndexes()                              # Check indexes
 ```
 
-### 3. Test Analytics
-```bash
-# Open Jupyter and run notebooks
-jupyter notebook
-# Open simple_analytics.ipynb for enhanced visualizations
-```
 
-### 4. Verify AI Summaries
-```bash
-# Get AI-powered summary
-python -m src.clients.summarize_once
-```
-
-## Performance Tuning
-
-### MongoDB Optimization
-```bash
-# Check indexes
-db.cell_logs.getIndexes()
-
-# Query performance
-db.cell_logs.explain().find({ts: {$gte: new Date(Date.now() - 3600000)}})
-```
-
-### Data Generation Optimization
-```bash
-# Larger batches for better performance
-python -m src.generator.generate_logs --cells 50 --interval 0.5 --iterations 1200
-```
-
-Keep only:
-- `README.md` (project overview)
-- `DEV.md` (this development guide)
-- `simple_analytics.ipynb` (analytics)
-- `enhanced_analytics.ipynb` (Better analytics)
+**Expected Output**: AI summary with network health status, actionable insights, and visual analytics dashboard.

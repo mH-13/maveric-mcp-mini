@@ -14,12 +14,18 @@ async def main():
             await session.initialize()
             res = await session.call_tool(name="fetch_logs", arguments={"limit": 5, "minutes": 10})
 
-            # Different SDK versions return structured results slightly differently.
-            # Most expose a .result dict:
+            # Handle MCP response structure
             try:
-                print(res.result)  # may be a list of docs
-            except AttributeError:
-                # Fallback: print raw object
+                if hasattr(res, 'structuredContent') and res.structuredContent:
+                    result = res.structuredContent.get('result', [])
+                    print(f"Found {len(result)} recent logs:")
+                    for log in result:
+                        print(f"  Cell {log['cell_id']}: {log['status']} at {log['ts']}")
+                else:
+                    print("No structured result found")
+                    print(res)
+            except Exception as e:
+                print(f"Error parsing response: {e}")
                 print(res)
 
 if __name__ == "__main__":

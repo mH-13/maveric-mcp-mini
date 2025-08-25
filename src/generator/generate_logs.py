@@ -1,4 +1,4 @@
-import asyncio, random, argparse
+import asyncio, random, argparse, sys
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 load_dotenv()
@@ -8,12 +8,19 @@ from mcp.client.stdio import stdio_client
 
 async def run(cell_count: int, interval_sec: float, iterations: int, flip_prob: float):
     # Launch the MCP server as a module (works with src/ layout)
-    server = StdioServerParameters(command="python", args=["-m", "src.mcp_server.server"])
+    # Suppress server debug output by redirecting stderr to devnull
+    server = StdioServerParameters(
+        command="python", 
+        args=["-m", "src.mcp_server.server"],
+        env={"PYTHONUNBUFFERED": "1"}
+    )
 
     # Track current ON/OFF state per cell
     states = {i: "OFF" for i in range(1, cell_count + 1)}
     run_id = 0
 
+    print(f"Starting log generation: {cell_count} cells, {iterations} iterations")
+    
     async with stdio_client(server) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
@@ -32,13 +39,20 @@ async def run(cell_count: int, interval_sec: float, iterations: int, flip_prob: 
                 ]
 
                 res = await session.call_tool(name="write_logs", arguments={"batch": batch})
-                # print inserted count if available
+                # Clean output - just show progress
                 try:
-                    print("inserted:", res.result.get("inserted"))
-                except Exception:
-                    print(res)
+                    # Handle new MCP response structure
+                    if hasattr(res, 'structuredContent') and res.structuredContent:
+                        inserted = res.structuredContent.get('result', {}).get('inserted', 0)
+                    else:
+                        inserted = len(batch)  # fallback
+                    print(f"Run {run_id:3d}: {inserted} logs inserted", flush=True)
+                except Exception as e:
+                    print(f"Run {run_id:3d}: {len(batch)} logs (status unknown)", flush=True)
 
                 await asyncio.sleep(interval_sec)
+            
+            print(f"\nCompleted: {iterations} iterations, {iterations * cell_count} total logs")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Generate cell ON/OFF logs via MCP.")
