@@ -14,16 +14,16 @@ Real-time network tower monitoring system using Model Context Protocol (MCP) for
 │ • ON/OFF status │                │ • fetch_logs    │                │ • Automatic     │
 │ • Batch writes  │                │ • summarize     │                │   indexing      │
 └─────────────────┘                └─────────────────┘                └─────────────────┘
-                                                 │
-                                                 │ API Call
-                                                 ▼
-                                        ┌─────────────────┐
-                                        │   Groq LLM      │
-                                        │                 │
-                                        │ • Natural lang  │
-                                        │   summaries     │
-                                        │ • Anomaly det   │
-                                        └─────────────────┘
+                                             │
+                                             │ API Call
+                                             ▼
+                                    ┌─────────────────┐
+                                    │   Groq LLM      │
+                                    │                 │
+                                    │ • Natural lang  │
+                                    │   summaries     │
+                                    │ • Anomaly det   │
+                                    └─────────────────┘
 ```
 
 
