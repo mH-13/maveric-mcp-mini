@@ -14,7 +14,7 @@ Real-time network tower monitoring with AI-powered analysis.
 ```bash
 git clone <repo_url>
 cd maveric-mcp-mini
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
