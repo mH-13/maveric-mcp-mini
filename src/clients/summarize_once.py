@@ -68,5 +68,5 @@ async def main(minutes: int = 10):
 
 if __name__ == "__main__":
     # Allow overriding minutes via env if you want (optional)
-    mins = int(os.getenv("SUMMARY_MINUTES", "10"))
+    mins = int(os.getenv("SUMMARY_MINUTES", "60"))  # Changed default to 60 minutes
     asyncio.run(main(mins))

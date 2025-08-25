@@ -1,34 +1,34 @@
 Summary Report:
 ==================================================
 === STATS ===
-Window: last 5 min
-Total events: 160
-ON: 99, OFF: 61
+Window: last 60 min
+Total events: 240
+ON: 92, OFF: 148
 Per-cell:
-  cell 1: ON=15 OFF=5
-  cell 2: ON=12 OFF=8
-  cell 3: ON=14 OFF=6
-  cell 4: ON=13 OFF=7
-  cell 5: ON=14 OFF=6
-  cell 6: ON=9 OFF=11
-  cell 7: ON=11 OFF=9
-  cell 8: ON=11 OFF=9
+  cell 1: ON=13 OFF=17
+  cell 2: ON=15 OFF=15
+  cell 3: ON=8 OFF=22
+  cell 4: ON=13 OFF=17
+  cell 5: ON=7 OFF=23
+  cell 6: ON=11 OFF=19
+  cell 7: ON=14 OFF=16
+  cell 8: ON=11 OFF=19
 ==================================================
 === SUMMARY ===
 🟢 NETWORK HEALTH: Warning
 
 📊 QUICK STATS:
-• 62.5% of towers are online
-• Average uptime: 62.5%
-• 3 towers are offline
+• 37.5% of towers are online
+• 62.5% of towers are offline
+• 4 towers are unstable (high downtime)
 
 🚨 IMMEDIATE ACTIONS:
-• Investigate and repair Tower 2, Tower 4, and Tower 8 as they are offline
-• Monitor Tower 6 closely due to low uptime (45.0%)
+• Investigate and resolve issues with towers 3, 5, 6, and 7 (offline)
+• Review and address high downtime on towers 3, 5, 6, and 8
 
 ⚠️ MONITORING FOCUS:
-• Tower 6: Low uptime and potential for service disruption
-• Towers 2, 4, and 8: Offline and require immediate repair
+• Towers 3, 5, 6, and 7 (offline and high downtime)
+• Towers 8 and 4 (low uptime, potential for future issues)
 
 DATA:
 ... (omitted for brevity)
